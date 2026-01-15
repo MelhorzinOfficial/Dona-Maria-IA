@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dona Maria IA — Design Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           DESIGN TOKENS — Tema Raposo
+           #333333 (base), #aeffde (primary), #e4f1ff (secondary)
+           ============================================ */
+        :root {
+            /* Core Colors */
+            --color-base: #333333;
+            --color-primary: #aeffde;
+            --color-secondary: #e4f1ff;
+            
+            /* Backgrounds */
+            --bg-darkest: #1a1a1a;
+            --bg-dark: #222222;
+            --bg-card: #2a2a2a;
+            --bg-hover: #3a3a3a;
+            
+            /* Text */
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #666666;
+            
+            /* Primary Variations */
+            --primary-light: #d4ffef;
+            --primary-dark: #7ad4b5;
+            --primary-glow: rgba(174, 255, 222, 0.15);
+            
+            /* Secondary Variations */
+            --secondary-light: #f0f7ff;
+            --secondary-dark: #b8d4f0;
+            
+            /* Confidence Colors */
+            --confidence-high: #aeffde;
+            --confidence-medium: #ffd966;
+            --confidence-low: #ff8080;
+            
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            
+            /* Typography */
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            
+            /* Borders */
+            --border-radius-sm: 6px;
+            --border-radius-md: 10px;
+            --border-radius-lg: 16px;
+            --border-radius-full: 9999px;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 20px rgba(174, 255, 222, 0.3);
+        }
+
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-darkest);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           LAYOUT — App Structure
+           ============================================ */
+        .app {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ============================================
+           SIDEBAR
+           ============================================ */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-dark);
+            border-right: 1px solid var(--bg-card);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--bg-card);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            margin-top: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            background: transparent;
+            border: 1px dashed var(--text-muted);
+            border-radius: var(--border-radius-md);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .new-chat-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: var(--primary-glow);
+        }
+
+        .conversations {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-md);
+        }
+
+        .conv-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .conv-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: var(--space-sm);
+            padding: 0 var(--space-sm);
+        }
+
+        .conv-item {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .conv-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .conv-item.active {
+            background: var(--primary-glow);
+            color: var(--color-primary);
+        }
+
+        .conv-item-icon {
+            opacity: 0.5;
+        }
+
+        .sidebar-footer {
+            padding: var(--space-md);
+            border-top: 1px solid var(--bg-card);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .user-menu:hover {
+            background: var(--bg-hover);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: var(--border-radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--color-base);
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-darkest);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            border-radius: var(--border-radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* ============================================
+           MESSAGES AREA
+           ============================================ */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .message {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .message-user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-user .message-content {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-md) var(--space-lg);
+            max-width: 70%;
+        }
+
+        .message-assistant {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.875rem;
+        }
+
+        .assistant-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .assistant-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* ============================================
+           CONFIDENCE BAR — O diferencial!
+           ============================================ */
+        .confidence-bar {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-md);
+            padding: var(--space-md);
+            margin-top: var(--space-sm);
+        }
+
+        .confidence-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-sm);
+        }
+
+        .confidence-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .confidence-value {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .confidence-value.high { color: var(--confidence-high); }
+        .confidence-value.medium { color: var(--confidence-medium); }
+        .confidence-value.low { color: var(--confidence-low); }
+
+        .confidence-track {
+            height: 8px;
+            background: var(--bg-hover);
+            border-radius: var(--border-radius-full);
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: var(--border-radius-full);
+            transition: width 1s ease-out;
+        }
+
+        .confidence-fill.high {
+            background: linear-gradient(90deg, var(--confidence-high), var(--primary-light));
+            box-shadow: 0 0 10px var(--confidence-high);
+        }
+
+        .confidence-fill.medium {
+            background: linear-gradient(90deg, var(--confidence-medium), #ffe599);
+        }
+
+        .confidence-fill.low {
+            background: linear-gradient(90deg, var(--confidence-low), #ffb3b3);
+        }
+
+        .confidence-sources {
+            margin-top: var(--space-sm);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .sources-badge {
+            background: var(--bg-hover);
+            padding: 2px 8px;
+            border-radius: var(--border-radius-full);
+            color: var(--color-secondary);
+        }
+
+        /* ============================================
+           SOURCE PANEL
+           ============================================ */
+        .source-panel {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-md);
+            margin-top: var(--space-sm);
+            overflow: hidden;
+        }
+
+        .source-panel-header {
+            padding: var(--space-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .source-panel-header:hover {
+            background: var(--bg-hover);
+        }
+
+        .source-panel-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .source-panel-content {
+            padding: 0 var(--space-md) var(--space-md);
+        }
+
+        .source-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--bg-hover);
+            font-size: 0.85rem;
+        }
+
+        .source-item:last-child {
+            border-bottom: none;
+        }
+
+        .source-icon {
+            color: var(--confidence-high);
+        }
+
+        .source-icon.diverge {
+            color: var(--confidence-medium);
+        }
+
+        .source-link {
+            color: var(--color-secondary);
+            text-decoration: none;
+        }
+
+        .source-link:hover {
+            text-decoration: underline;
+        }
+
+        .source-meta {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* ============================================
+           CODE BLOCK
+           ============================================ */
+        .code-block {
+            background: var(--bg-dark);
+            border-radius: var(--border-radius-md);
+            margin: var(--space-md) 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--bg-hover);
+        }
+
+        .code-lang {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--border-radius-sm);
+            transition: all 0.15s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg-hover);
+            color: var(--color-primary);
+        }
+
+        .code-content {
+            padding: var(--space-md);
+            overflow-x: auto;
+        }
+
+        .code-content pre {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        /* Syntax highlighting colors */
+        .code-keyword { color: var(--color-primary); }
+        .code-string { color: var(--confidence-medium); }
+        .code-comment { color: var(--text-muted); font-style: italic; }
+        .code-function { color: var(--color-secondary); }
+
+        /* ============================================
+           UNCERTAINTY BANNER
+           ============================================ */
+        .uncertainty-banner {
+            background: linear-gradient(135deg, rgba(255, 217, 102, 0.1), rgba(255, 128, 128, 0.1));
+            border: 1px solid var(--confidence-medium);
+            border-radius: var(--border-radius-md);
+            padding: var(--space-md);
+            margin: var(--space-md) 0;
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+        }
+
+        .uncertainty-icon {
+            font-size: 1.5rem;
+        }
+
+        .uncertainty-text {
+            flex: 1;
+        }
+
+        .uncertainty-title {
+            font-weight: 600;
+            color: var(--confidence-medium);
+            margin-bottom: var(--space-xs);
+        }
+
+        .uncertainty-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================
+           RESEARCH STATUS
+           ============================================ */
+        .research-status {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-md);
+            padding: var(--space-md);
+            margin: var(--space-md) 0;
+        }
+
+        .research-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+            font-weight: 500;
+        }
+
+        .research-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--bg-hover);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .research-sources {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .research-source {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .research-source.done {
+            color: var(--confidence-high);
+        }
+
+        .research-source.pending {
+            color: var(--text-muted);
+        }
+
+        .research-progress {
+            margin-top: var(--space-md);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           FEEDBACK BUTTONS
+           ============================================ */
+        .feedback-buttons {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+
+        .feedback-btn {
+            background: transparent;
+            border: 1px solid var(--bg-hover);
+            border-radius: var(--border-radius-sm);
+            padding: var(--space-xs) var(--space-sm);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.8rem;
+            transition: all 0.15s ease;
+        }
+
+        .feedback-btn:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .feedback-btn.active-positive {
+            border-color: var(--confidence-high);
+            color: var(--confidence-high);
+            background: rgba(174, 255, 222, 0.1);
+        }
+
+        .feedback-btn.active-negative {
+            border-color: var(--confidence-low);
+            color: var(--confidence-low);
+            background: rgba(255, 128, 128, 0.1);
+        }
+
+        /* ============================================
+           INPUT AREA
+           ============================================ */
+        .input-area {
+            padding: var(--space-lg);
+            background: var(--bg-dark);
+            border-top: 1px solid var(--bg-card);
+        }
+
+        .input-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chat-input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--bg-hover);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-md) var(--space-lg);
+            padding-right: 60px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            resize: none;
+            min-height: 56px;
+            max-height: 200px;
+            transition: border-color 0.2s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            position: absolute;
+            right: var(--space-sm);
+            bottom: var(--space-sm);
+            width: 40px;
+            height: 40px;
+            background: var(--color-primary);
+            border: none;
+            border-radius: var(--border-radius-md);
+            color: var(--color-base);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .send-btn:hover {
+            background: var(--primary-light);
+            transform: scale(1.05);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .input-hint {
+            text-align: center;
+            margin-top: var(--space-sm);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            border: none;
+            color: var(--color-base);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-glow);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        /* ============================================
+           COLOR PALETTE SHOWCASE
+           ============================================ */
+        .palette-section {
+            padding: var(--space-2xl);
+            background: var(--bg-dark);
+            border-top: 1px solid var(--bg-card);
+        }
+
+        .palette-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+            color: var(--text-primary);
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .palette-card {
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .palette-color {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        .palette-info {
+            padding: var(--space-md);
+            background: var(--bg-card);
+        }
+
+        .palette-name {
+            font-weight: 500;
+            margin-bottom: var(--space-xs);
+        }
+
+        .palette-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100%;
+                z-index: 100;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .message-user .message-content {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <span>Dona Maria</span>
+                </div>
+                <button class="new-chat-btn">
+                    <span>+</span>
+                    <span>Nova Conversa</span>
+                </button>
+            </div>
+            
+            <div class="conversations">
+                <div class="conv-section">
+                    <div class="conv-section-title">Hoje</div>
+                    <div class="conv-item active">
+                        <span class="conv-item-icon">💬</span>
+                        Otimização PostgreSQL
+                    </div>
+                    <div class="conv-item">
+                        <span class="conv-item-icon">💬</span>
+                        Deploy Next.js na Vercel
+                    </div>
+                </div>
+                
+                <div class="conv-section">
+                    <div class="conv-section-title">Ontem</div>
+                    <div class="conv-item">
+                        <span class="conv-item-icon">💬</span>
+                        React Server Components
+                    </div>
+                    <div class="conv-item">
+                        <span class="conv-item-icon">💬</span>
+                        WebSockets vs SSE
+                    </div>
+                </div>
+                
+                <div class="conv-section">
+                    <div class="conv-section-title">Esta semana</div>
+                    <div class="conv-item">
+                        <span class="conv-item-icon">💬</span>
+                        Auth com JWT
+                    </div>
+                    <div class="conv-item">
+                        <span class="conv-item-icon">💬</span>
+                        Docker multi-stage
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-menu">
+                    <div class="user-avatar">R</div>
+                    <span class="user-name">Raposo</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main">
+            <header class="chat-header">
+                <div class="chat-title">Otimização PostgreSQL</div>
+                <div class="chat-actions">
+                    <button class="icon-btn" title="Compartilhar">🔗</button>
+                    <button class="icon-btn" title="Configurações">⚙️</button>
+                </div>
+            </header>
+
+            <div class="messages">
+                <!-- USER MESSAGE -->
+                <div class="message message-user">
+                    <div class="message-content">
+                        Como otimizar queries lentas no PostgreSQL? Estou tendo problemas de performance em uma tabela com 10M de registros.
+                    </div>
+                </div>
+
+                <!-- ASSISTANT MESSAGE with HIGH CONFIDENCE -->
+                <div class="message message-assistant">
+                    <div class="message-header">
+                        <div class="assistant-icon">🤖</div>
+                        <span class="assistant-name">Dona Maria</span>
+                        <span class="message-time">há 2 min</span>
+                    </div>
+                    
+                    <div class="message-text">
+                        <p>Ótima pergunta! Para otimizar queries em tabelas grandes no PostgreSQL, aqui estão as estratégias mais efetivas baseadas na minha pesquisa:</p>
+                        
+                        <p><strong>1. Use EXPLAIN ANALYZE</strong> — Sempre comece analisando o plano de execução:</p>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">sql</span>
+                                <button class="copy-btn">📋 Copiar</button>
+                            </div>
+                            <div class="code-content">
+<pre><span class="code-keyword">EXPLAIN</span> <span class="code-keyword">ANALYZE</span>
+<span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> orders
+<span class="code-keyword">WHERE</span> created_at > <span class="code-string">'2024-01-01'</span>
+<span class="code-keyword">AND</span> status = <span class="code-string">'pending'</span>;</pre>
+                            </div>
+                        </div>
+                        
+                        <p><strong>2. Índices compostos</strong> — Para sua query, um índice composto pode ajudar muito:</p>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">sql</span>
+                                <button class="copy-btn">📋 Copiar</button>
+                            </div>
+                            <div class="code-content">
+<pre><span class="code-keyword">CREATE INDEX</span> <span class="code-function">idx_orders_status_created</span>
+<span class="code-keyword">ON</span> orders(status, created_at <span class="code-keyword">DESC</span>);</pre>
+                            </div>
+                        </div>
+                        
+                        <p><strong>3. Particionamento</strong> — Com 10M de registros, considere particionar por data:</p>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">sql</span>
+                                <button class="copy-btn">📋 Copiar</button>
+                            </div>
+                            <div class="code-content">
+<pre><span class="code-keyword">CREATE TABLE</span> orders (
+    id <span class="code-keyword">SERIAL</span>,
+    created_at <span class="code-keyword">TIMESTAMP</span>,
+    status <span class="code-keyword">VARCHAR</span>(20)
+) <span class="code-keyword">PARTITION BY RANGE</span> (created_at);</pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CONFIDENCE BAR -->
+                    <div class="confidence-bar">
+                        <div class="confidence-header">
+                            <span class="confidence-label">
+                                📊 Nível de Confiança
+                            </span>
+                            <span class="confidence-value high">87%</span>
+                        </div>
+                        <div class="confidence-track">
+                            <div class="confidence-fill high" style="width: 87%"></div>
+                        </div>
+                        <div class="confidence-sources">
+                            <span>📚</span>
+                            <span>Baseado em</span>
+                            <span class="sources-badge">12 fontes</span>
+                            <span>•</span>
+                            <span>10 concordam</span>
+                        </div>
+                    </div>
+                    
+                    <!-- SOURCE PANEL -->
+                    <div class="source-panel">
+                        <div class="source-panel-header">
+                            <span class="source-panel-title">
+                                📖 Fontes Consultadas
+                            </span>
+                            <span>▼</span>
+                        </div>
+                        <div class="source-panel-content">
+                            <div class="source-item">
+                                <span class="source-icon">✓</span>
+                                <div>
+                                    <a href="#" class="source-link">[1] PostgreSQL Official Docs - Indexes</a>
+                                    <div class="source-meta">postgresql.org • Oficial</div>
+                                </div>
+                            </div>
+                            <div class="source-item">
+                                <span class="source-icon">✓</span>
+                                <div>
+                                    <a href="#" class="source-link">[2] Use The Index, Luke! - SQL Tuning</a>
+                                    <div class="source-meta">use-the-index-luke.com • Referência</div>
+                                </div>
+                            </div>
+                            <div class="source-item">
+                                <span class="source-icon diverge">⚠</span>
+                                <div>
+                                    <a href="#" class="source-link">[3] Dev.to - PostgreSQL Performance Tips</a>
+                                    <div class="source-meta">dev.to • Diverge em índices parciais</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- FEEDBACK -->
+                    <div class="feedback-buttons">
+                        <button class="feedback-btn active-positive">👍 Útil</button>
+                        <button class="feedback-btn">👎</button>
+                        <button class="feedback-btn">🔗 Compartilhar</button>
+                        <button class="feedback-btn">📋 Copiar</button>
+                    </div>
+                </div>
+
+                <!-- USER MESSAGE 2 -->
+                <div class="message message-user">
+                    <div class="message-content">
+                        E se eu quiser usar índices parciais? Quando vale a pena?
+                    </div>
+                </div>
+
+                <!-- ASSISTANT MESSAGE with MEDIUM CONFIDENCE -->
+                <div class="message message-assistant">
+                    <div class="message-header">
+                        <div class="assistant-icon">🤖</div>
+                        <span class="assistant-name">Dona Maria</span>
+                        <span class="message-time">há 1 min</span>
+                    </div>
+                    
+                    <!-- UNCERTAINTY BANNER -->
+                    <div class="uncertainty-banner">
+                        <span class="uncertainty-icon">💭</span>
+                        <div class="uncertainty-text">
+                            <div class="uncertainty-title">Há divergência nas fontes sobre este tema</div>
+                            <div class="uncertainty-desc">
+                                Encontrei opiniões diferentes sobre quando usar índices parciais. Vou te mostrar os dois lados para você decidir.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message-text">
+                        <p>Índices parciais são úteis quando você filtra frequentemente por um subconjunto específico de dados. <strong>Mas há nuances:</strong></p>
+                        
+                        <p><strong>✅ A favor (maioria das fontes):</strong></p>
+                        <ul>
+                            <li>Economiza espaço em disco</li>
+                            <li>Mais rápido para atualizar que índices completos</li>
+                            <li>Ideal para queries com filtros constantes</li>
+                        </ul>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">sql</span>
+                                <button class="copy-btn">📋 Copiar</button>
+                            </div>
+                            <div class="code-content">
+<pre><span class="code-comment">-- Índice parcial para orders pendentes</span>
+<span class="code-keyword">CREATE INDEX</span> <span class="code-function">idx_pending_orders</span>
+<span class="code-keyword">ON</span> orders(created_at)
+<span class="code-keyword">WHERE</span> status = <span class="code-string">'pending'</span>;</pre>
+                            </div>
+                        </div>
+                        
+                        <p><strong>⚠️ Contra (algumas fontes):</strong></p>
+                        <ul>
+                            <li>Pode não ser usado se query não bater exatamente</li>
+                            <li>Manutenção mais complexa</li>
+                            <li>Benefício marginal se filtro muda frequentemente</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- CONFIDENCE BAR - MEDIUM -->
+                    <div class="confidence-bar">
+                        <div class="confidence-header">
+                            <span class="confidence-label">
+                                📊 Nível de Confiança
+                            </span>
+                            <span class="confidence-value medium">63%</span>
+                        </div>
+                        <div class="confidence-track">
+                            <div class="confidence-fill medium" style="width: 63%"></div>
+                        </div>
+                        <div class="confidence-sources">
+                            <span>📚</span>
+                            <span>Baseado em</span>
+                            <span class="sources-badge">8 fontes</span>
+                            <span>•</span>
+                            <span style="color: var(--confidence-medium);">5 concordam, 3 divergem</span>
+                        </div>
+                    </div>
+                    
+                    <!-- FEEDBACK -->
+                    <div class="feedback-buttons">
+                        <button class="feedback-btn">👍</button>
+                        <button class="feedback-btn">👎</button>
+                        <button class="feedback-btn">🔗 Compartilhar</button>
+                        <button class="feedback-btn">📋 Copiar</button>
+                    </div>
+                </div>
+
+                <!-- RESEARCH STATUS (Simulating searching) -->
+                <div class="message message-assistant">
+                    <div class="message-header">
+                        <div class="assistant-icon">🤖</div>
+                        <span class="assistant-name">Dona Maria</span>
+                        <span class="message-time">agora</span>
+                    </div>
+                    
+                    <div class="research-status">
+                        <div class="research-header">
+                            <div class="research-spinner"></div>
+                            <span>Pesquisando fontes...</span>
+                        </div>
+                        <div class="research-sources">
+                            <div class="research-source done">
+                                <span>✓</span>
+                                <span>PostgreSQL Official Docs</span>
+                            </div>
+                            <div class="research-source done">
+                                <span>✓</span>
+                                <span>Stack Overflow</span>
+                            </div>
+                            <div class="research-source pending">
+                                <span>⏳</span>
+                                <span>GitHub Discussions</span>
+                            </div>
+                            <div class="research-source pending">
+                                <span>⏳</span>
+                                <span>AWS Database Blog</span>
+                            </div>
+                        </div>
+                        <div class="research-progress">2 de 4 fontes consultadas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INPUT AREA -->
+            <div class="input-area">
+                <div class="input-container">
+                    <textarea class="chat-input" placeholder="Pergunte qualquer coisa..." rows="1"></textarea>
+                    <button class="send-btn">↵</button>
+                </div>
+                <div class="input-hint">
+                    Enter para enviar • Shift+Enter para nova linha • Ctrl+K para buscar
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- COLOR PALETTE SHOWCASE -->
+    <section class="palette-section">
+        <h2 class="palette-title">🎨 Paleta de Cores — Tema Raposo</h2>
+        <div class="palette-grid">
+            <div class="palette-card">
+                <div class="palette-color" style="background: #333333; color: #fff;">#333333</div>
+                <div class="palette-info">
+                    <div class="palette-name">Base</div>
+                    <div class="palette-desc">Cor de fundo principal, texto em light mode</div>
+                </div>
+            </div>
+            <div class="palette-card">
+                <div class="palette-color" style="background: #aeffde; color: #333;">#AEFFDE</div>
+                <div class="palette-info">
+                    <div class="palette-name">Primary (Verde Menta)</div>
+                    <div class="palette-desc">CTAs, confiança alta, sucesso, destaques</div>
+                </div>
+            </div>
+            <div class="palette-card">
+                <div class="palette-color" style="background: #e4f1ff; color: #333;">#E4F1FF</div>
+                <div class="palette-info">
+                    <div class="palette-name">Secondary (Azul Claro)</div>
+                    <div class="palette-desc">Links, informações, hover states</div>
+                </div>
+            </div>
+            <div class="palette-card">
+                <div class="palette-color" style="background: #1a1a1a; color: #fff;">#1A1A1A</div>
+                <div class="palette-info">
+                    <div class="palette-name">Background Darkest</div>
+                    <div class="palette-desc">Fundo mais escuro da aplicação</div>
+                </div>
+            </div>
+            <div class="palette-card">
+                <div class="palette-color" style="background: #ffd966; color: #333;">#FFD966</div>
+                <div class="palette-info">
+                    <div class="palette-name">Confidence Medium</div>
+                    <div class="palette-desc">50-79% de confiança, warnings</div>
+                </div>
+            </div>
+            <div class="palette-card">
+                <div class="palette-color" style="background: #ff8080; color: #333;">#FF8080</div>
+                <div class="palette-info">
+                    <div class="palette-name">Confidence Low</div>
+                    <div class="palette-desc">&lt;50% de confiança, erros</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Auto-resize textarea
+        const textarea = document.querySelector('.chat-input');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+
+        // Copy button functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const code = this.closest('.code-block').querySelector('pre').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const original = this.innerHTML;
+                    this.innerHTML = '✓ Copiado!';
+                    this.style.color = 'var(--confidence-high)';
+                    setTimeout(() => {
+                        this.innerHTML = original;
+                        this.style.color = '';
+                    }, 2000);
+                });
+            });
+        });
+
+        // Feedback buttons
+        document.querySelectorAll('.feedback-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.textContent.includes('👍')) {
+                    this.classList.toggle('active-positive');
+                    this.closest('.feedback-buttons').querySelector('.feedback-btn:nth-child(2)').classList.remove('active-negative');
+                } else if (this.textContent.includes('👎')) {
+                    this.classList.toggle('active-negative');
+                    this.closest('.feedback-buttons').querySelector('.feedback-btn:nth-child(1)').classList.remove('active-positive');
+                }
+            });
+        });
+
+        // Animate confidence bars on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.confidence-fill').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
