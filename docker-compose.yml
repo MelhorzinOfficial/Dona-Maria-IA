@@ -32,6 +32,14 @@ services:
    start_period: 40s
   networks:
    - dokploy-network
+  labels:
+   - "traefik.enable=true"
+   - "traefik.http.routers.dona-maria-frontend-web.rule=Host(`donamaria.melhorzin.com`)"
+   - "traefik.http.routers.dona-maria-frontend-web.entrypoints=web"
+   - "traefik.http.routers.dona-maria-frontend-websecure.rule=Host(`donamaria.melhorzin.com`)"
+   - "traefik.http.routers.dona-maria-frontend-websecure.entrypoints=websecure"
+   - "traefik.http.routers.dona-maria-frontend-websecure.tls=true"
+   - "traefik.http.services.dona-maria-frontend.loadbalancer.server.port=3000"
 
  # ==========================================
  # Backend - FastAPI
