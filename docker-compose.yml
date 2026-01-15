@@ -1,10 +1,10 @@
 # ============================================
-# Dona Maria IA - Production Docker Compose
+# Dona Maria IA - Docker Compose for Dokploy
 # ============================================
-# Usage:
-#   docker-compose up -d --build
+# Optimized for deployment with Dokploy + Traefik
+# Configure domains via Dokploy UI or Traefik labels
 #
-# Configure via .env file (copy from .env.example)
+# Required: Set environment variables in Dokploy UI
 # ============================================
 
 services:
@@ -16,29 +16,25 @@ services:
    context: ./frontend
    dockerfile: Dockerfile
    args:
-    - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
-    - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-ws://localhost:8000}
+    - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
     - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME:-Dona Maria IA}
-  image: dona-maria-ia-frontend:${APP_VERSION:-latest}
-  container_name: dona-maria-frontend
   restart: unless-stopped
-  ports:
-   - '${FRONTEND_PORT:-3000}:3000'
+  expose:
+   - '3000'
   environment:
    - NODE_ENV=production
   depends_on:
    backend:
     condition: service_healthy
   networks:
-   - dona-maria-network
-  deploy:
-   resources:
-    limits:
-     cpus: '1'
-     memory: 512M
-    reservations:
-     cpus: '0.25'
-     memory: 128M
+   - dokploy-network
+  labels:
+   - 'traefik.enable=true'
+   - 'traefik.http.routers.dona-maria-frontend.rule=Host(`${FRONTEND_DOMAIN}`)'
+   - 'traefik.http.routers.dona-maria-frontend.entrypoints=websecure'
+   - 'traefik.http.routers.dona-maria-frontend.tls.certResolver=letsencrypt'
+   - 'traefik.http.services.dona-maria-frontend.loadbalancer.server.port=3000'
 
  # ==========================================
  # Backend - FastAPI
@@ -47,18 +43,16 @@ services:
   build:
    context: ./backend
    dockerfile: Dockerfile
-  image: dona-maria-ia-backend:${APP_VERSION:-latest}
-  container_name: dona-maria-backend
   restart: unless-stopped
-  ports:
-   - '${BACKEND_PORT:-8000}:8000'
+  expose:
+   - '8000'
   environment:
    - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
    - REDIS_URL=redis://:${REDIS_PASSWORD:-}@redis:6379
    - ENVIRONMENT=production
    - DEBUG=false
    - SECRET_KEY=${SECRET_KEY}
-   - CORS_ORIGINS=${CORS_ORIGINS:-["http://localhost:3000"]}
+   - CORS_ORIGINS=["https://${FRONTEND_DOMAIN}"]
    - OPENAI_API_KEY=${OPENAI_API_KEY:-}
    - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
   depends_on:
@@ -67,25 +61,20 @@ services:
    redis:
     condition: service_healthy
   networks:
-   - dona-maria-network
-  deploy:
-   resources:
-    limits:
-     cpus: '2'
-     memory: 1G
-    reservations:
-     cpus: '0.5'
-     memory: 256M
+   - dokploy-network
+  labels:
+   - 'traefik.enable=true'
+   - 'traefik.http.routers.dona-maria-backend.rule=Host(`${BACKEND_DOMAIN}`)'
+   - 'traefik.http.routers.dona-maria-backend.entrypoints=websecure'
+   - 'traefik.http.routers.dona-maria-backend.tls.certResolver=letsencrypt'
+   - 'traefik.http.services.dona-maria-backend.loadbalancer.server.port=8000'
 
  # ==========================================
  # PostgreSQL Database
  # ==========================================
  postgres:
   image: postgres:16-alpine
-  container_name: dona-maria-postgres
   restart: unless-stopped
-  ports:
-   - '${POSTGRES_PORT:-5432}:5432'
   environment:
    - POSTGRES_USER=${POSTGRES_USER}
    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -100,25 +89,14 @@ services:
    retries: 5
    start_period: 10s
   networks:
-   - dona-maria-network
-  deploy:
-   resources:
-    limits:
-     cpus: '1'
-     memory: 512M
-    reservations:
-     cpus: '0.25'
-     memory: 128M
+   - dokploy-network
 
  # ==========================================
  # Redis Cache
  # ==========================================
  redis:
   image: redis:7-alpine
-  container_name: dona-maria-redis
   restart: unless-stopped
-  ports:
-   - '${REDIS_PORT:-6379}:6379'
   command: >
    redis-server
    --appendonly yes
@@ -134,28 +112,18 @@ services:
    retries: 5
    start_period: 5s
   networks:
-   - dona-maria-network
-  deploy:
-   resources:
-    limits:
-     cpus: '0.5'
-     memory: 256M
-    reservations:
-     cpus: '0.1'
-     memory: 64M
+   - dokploy-network
 
 # ==========================================
 # Volumes (Persistent Data)
 # ==========================================
 volumes:
  postgres_data:
-  driver: local
  redis_data:
-  driver: local
 
 # ==========================================
-# Networks
+# Networks (Dokploy managed)
 # ==========================================
 networks:
- dona-maria-network:
-  driver: bridge
+ dokploy-network:
+  external: true
