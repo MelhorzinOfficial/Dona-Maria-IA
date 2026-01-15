@@ -96,4 +96,9 @@ workflow_status:
  # Phase 4: Implementation
  - phase: 4
    name: 'Implementation'
-   workflows:
+   workflows:
+    - id: 'sprint-planning'
+      status: 'required'
+      agent: 'sm'
+      command: '/bmad:bmm:workflows:sprint-planning'
+      note: 'Creates sprint plan - subsequent work tracked in sprint-status'
