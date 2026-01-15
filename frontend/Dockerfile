@@ -3,13 +3,13 @@
 # Multi-stage build for optimized image
 # ============================================
 
-# Stage 1: Dependencies
+# Stage 1: Dependencies (includes devDependencies for build)
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Install dependencies only when needed
+# Install ALL dependencies (need devDeps like typescript for build)
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci && npm cache clean --force
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
