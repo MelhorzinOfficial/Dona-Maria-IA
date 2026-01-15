@@ -48,7 +48,7 @@ development_status:
  1-2-registro-de-usuario-com-email: done
  1-3-registro-com-oauth-google-e-github: review
  1-4-login-e-logout: review
- 1-5-reset-de-senha-via-email: backlog
+ 1-5-reset-de-senha-via-email: review
  epic-1-retrospective: optional
 
  # ═══════════════════════════════════════════════════════════════════════════

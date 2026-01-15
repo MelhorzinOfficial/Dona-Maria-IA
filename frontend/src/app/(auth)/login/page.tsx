@@ -33,6 +33,13 @@ export default function LoginPage() {
           {/* Formulário de login com email */}
           <LoginForm />
 
+          {/* Link Esqueci Senha */}
+          <p className="mt-4 text-center text-sm">
+            <Link href="/forgot-password" className="text-[#aeffde] hover:underline">
+              Esqueci minha senha
+            </Link>
+          </p>
+
           {/* Separador */}
           <div className="my-6 flex items-center">
             <div className="flex-1 border-t border-[#e4f1ff]/20"></div>

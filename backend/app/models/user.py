@@ -9,7 +9,7 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, Index, String
 from sqlalchemy.dialects.postgresql import JSON, UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.models.base import Base
@@ -39,6 +39,9 @@ class User(Base):
     )
 
     __table_args__ = (Index("idx_users_email", "email"),)
+
+    # Relationships
+    password_reset_tokens = relationship("PasswordResetToken", back_populates="user")
 
     def __repr__(self) -> str:
         """Representação string do usuário."""

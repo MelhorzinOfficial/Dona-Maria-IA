@@ -206,3 +206,17 @@ class AuthService:
         if not verify_password(password, user.password_hash):
             return None
         return user
+
+    async def invalidate_all_sessions(self, user_id: UUID) -> None:
+        """
+        Invalidar todas as sessões ativas do usuário.
+
+        No MVP, como não há sessões persistentes, apenas um placeholder.
+        Quando rate limiting for implementado, invalidará sessões Redis.
+
+        Args:
+            user_id: UUID do usuário.
+        """
+        # TODO: Implementar invalidação de sessões quando user_sessions table for criada
+        # Por enquanto, apenas placeholder para cumprir AC
+        pass

@@ -13,8 +13,12 @@ from app.api.deps import CurrentUser
 from app.config.database import get_db
 from app.config.oauth import oauth_settings
 from app.schemas.auth import OAuthProvider, RefreshTokenRequest, Token, UserCreate
-from app.services.auth_service import AuthService, verify_token
-from app.services.oauth_service import OAuthService
+from app.schemas.password_reset import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    ForgotPasswordResponse
+)
+from app.services.password_reset_service import PasswordResetService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -268,4 +272,62 @@ async def oauth_callback(
             url=f"{frontend_url}/login?error=oauth_failed",
             status_code=302,
         )
+
+
+@router.post("/forgot-password", response_model=ForgotPasswordResponse)
+async def forgot_password(
+    request: ForgotPasswordRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Solicitar link de reset de senha via email.
+
+    Sempre retorna sucesso para não revelar se email existe.
+    """
+    service = PasswordResetService(db)
+    await service.request_reset(request.email)
+
+    return ForgotPasswordResponse(
+        message="Se o email estiver cadastrado, você receberá um link de recuperação."
+    )
+
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+async def reset_password(
+    request: ResetPasswordRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Resetar senha usando token válido.
+    """
+    service = PasswordResetService(db)
+    success = await service.reset_password(request.token, request.new_password)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Link expirado ou inválido. Solicite um novo link."
+        )
+
+    return {"message": "Senha alterada com sucesso. Faça login com sua nova senha."}
+
+
+@router.get("/verify-reset-token/{token}")
+async def verify_reset_token(
+    token: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Verificar se token de reset é válido (para UI mostrar form ou erro).
+    """
+    service = PasswordResetService(db)
+    reset_token = await service.verify_token(token)
+
+    if not reset_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Link expirado ou inválido."
+        )
+
+    return {"valid": True}
 
