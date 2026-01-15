@@ -44,8 +44,8 @@ development_status:
  # Estabelecer infraestrutura base e autenticação segura
  # ═══════════════════════════════════════════════════════════════════════════
  epic-1: in-progress
- 1-1-setup-inicial-do-projeto: review
- 1-2-registro-de-usuario-com-email: backlog
+ 1-1-setup-inicial-do-projeto: done
+ 1-2-registro-de-usuario-com-email: done
  1-3-registro-com-oauth-google-e-github: backlog
  1-4-login-e-logout: backlog
  1-5-reset-de-senha-via-email: backlog

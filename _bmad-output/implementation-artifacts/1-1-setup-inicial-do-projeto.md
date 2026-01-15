@@ -1,6 +1,6 @@
 # Story 1.1: Setup Inicial do Projeto
 
-Status: review
+Status: done
 
 ## Story
 
@@ -354,6 +354,14 @@ Claude Opus 4.5 (Amelia - Developer Agent)
 | 2026-01-15 | Criação da estrutura inicial do projeto | Story 1.1 - Setup Inicial                 |
 | 2026-01-15 | Correção do Dockerfile.dev backend      | README.md necessário para hatchling build |
 | 2026-01-15 | Adição de .dockerignore                 | Evitar copiar node_modules e cache        |
+| 2026-01-15 | [CR] Adicionado MyPy strict config      | Code Review: Task 3.6 não estava completa |
+| 2026-01-15 | [CR] Corrigido metadata layout.tsx      | Code Review: Metadata ainda era template  |
+| 2026-01-15 | [CR] Criado page.tsx customizado        | Code Review: Página inicial era template  |
+| 2026-01-15 | [CR] Tipografia Inter/JetBrains Mono    | Code Review: Conformidade com UX spec     |
+| 2026-01-15 | [CR] Cores UX Design no globals.css     | Code Review: Conformidade com UX spec     |
+| 2026-01-15 | [CR] Removido auth deps do pyproject    | Code Review: Scope creep da Story 1-2     |
+| 2026-01-15 | [CR] Removido auth import do router     | Code Review: Scope creep da Story 1-2     |
+| 2026-01-15 | [CR] html lang="pt-BR"                  | Code Review: SEO/Acessibilidade           |
 
 ### File List
 
