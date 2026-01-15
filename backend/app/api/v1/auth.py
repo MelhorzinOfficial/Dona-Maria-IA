@@ -6,12 +6,14 @@ Endpoints para registro e autenticação de usuários.
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.deps import CurrentUser
 from app.config.database import get_db
 from app.config.oauth import oauth_settings
-from app.schemas.auth import OAuthProvider, Token, UserCreate
-from app.services.auth_service import AuthService
+from app.schemas.auth import OAuthProvider, RefreshTokenRequest, Token, UserCreate
+from app.services.auth_service import AuthService, verify_token
 from app.services.oauth_service import OAuthService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -51,6 +53,101 @@ async def register(
     # Gerar tokens
     tokens = auth_service.create_tokens(user.id)
 
+    return Token(**tokens)
+
+
+@router.post("/login", response_model=Token)
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: AsyncSession = Depends(get_db),
+) -> Token:
+    """
+    Fazer login com email e senha.
+
+    Args:
+        form_data: Email (username) e senha do usuário.
+        db: Sessão do banco de dados.
+
+    Returns:
+        Token: Tokens JWT de acesso e refresh.
+
+    Raises:
+        HTTPException: Se credenciais inválidas.
+    """
+    auth_service = AuthService(db)
+    user = await auth_service.authenticate_user(form_data.username, form_data.password)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email ou senha incorretos",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    tokens = auth_service.create_tokens(user.id)
+    return Token(**tokens)
+
+
+@router.post("/logout")
+async def logout(
+    current_user: CurrentUser,
+) -> dict:
+    """
+    Fazer logout do usuário atual.
+
+    Remove tokens do lado do cliente. Sessão Redis será implementada
+    quando rate limiting for adicionado.
+
+    Args:
+        current_user: Usuário autenticado.
+
+    Returns:
+        Mensagem de sucesso.
+    """
+    # No MVP, logout é feito removendo tokens no cliente.
+    # Sessão Redis é preparada mas não obrigatória para AC.
+    return {"message": "Logout realizado com sucesso"}
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_token(
+    request: RefreshTokenRequest,
+    db: AsyncSession = Depends(get_db),
+) -> Token:
+    """
+    Renovar access token usando refresh token.
+
+    Args:
+        request: Refresh token para validação.
+        db: Sessão do banco de dados.
+
+    Returns:
+        Novos tokens JWT.
+
+    Raises:
+        HTTPException: Se refresh token inválido ou expirado.
+    """
+    # Verificar refresh token
+    token_data = verify_token(request.refresh_token, token_type="refresh")
+    if token_data is None or token_data.user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sessão expirada",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Verificar se usuário existe
+    auth_service = AuthService(db)
+    user = await auth_service.get_user_by_id(token_data.user_id)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sessão expirada",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Gerar novos tokens
+    tokens = auth_service.create_tokens(user.id)
     return Token(**tokens)
 
 

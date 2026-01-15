@@ -185,3 +185,24 @@ class AuthService:
             "refresh_token": create_refresh_token(user_id),
             "token_type": "bearer",
         }
+
+    async def authenticate_user(self, email: str, password: str) -> User | None:
+        """
+        Autenticar usuário com email e senha.
+
+        Args:
+            email: Email do usuário.
+            password: Senha em texto plano.
+
+        Returns:
+            Objeto User se credenciais válidas, None caso contrário.
+        """
+        user = await self.get_user_by_email(email)
+        if user is None:
+            return None
+        if not user.password_hash:
+            # Usuário OAuth não tem password_hash
+            return None
+        if not verify_password(password, user.password_hash):
+            return None
+        return user

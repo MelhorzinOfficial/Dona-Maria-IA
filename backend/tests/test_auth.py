@@ -201,3 +201,150 @@ class TestRegister:
             },
         )
         assert response.status_code == 422
+
+
+class TestLogin:
+    """Tests for the login endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_login_success(self, client: AsyncClient) -> None:
+        """Test successful login returns tokens."""
+        # First register a user
+        email = "login@example.com"
+        password = "password123"
+        await client.post(
+            "/api/v1/auth/register",
+            json={"email": email, "password": password},
+        )
+
+        # Then login
+        response = await client.post(
+            "/api/v1/auth/login",
+            data={"username": email, "password": password},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "access_token" in data
+        assert "refresh_token" in data
+        assert data["token_type"] == "bearer"
+
+    @pytest.mark.asyncio
+    async def test_login_wrong_password(self, client: AsyncClient) -> None:
+        """Test login with wrong password returns 401."""
+        email = "wrongpass@example.com"
+        await client.post(
+            "/api/v1/auth/register",
+            json={"email": email, "password": "password123"},
+        )
+
+        response = await client.post(
+            "/api/v1/auth/login",
+            data={"username": email, "password": "wrongpassword"},
+        )
+        assert response.status_code == 401
+        assert "Email ou senha incorretos" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_login_nonexistent_user(self, client: AsyncClient) -> None:
+        """Test login with nonexistent email returns 401."""
+        response = await client.post(
+            "/api/v1/auth/login",
+            data={"username": "nonexistent@example.com", "password": "password123"},
+        )
+        assert response.status_code == 401
+        assert "Email ou senha incorretos" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_login_email_case_insensitive(self, client: AsyncClient) -> None:
+        """Test login works with different email case."""
+        await client.post(
+            "/api/v1/auth/register",
+            json={"email": "case@example.com", "password": "password123"},
+        )
+
+        response = await client.post(
+            "/api/v1/auth/login",
+            data={"username": "CASE@EXAMPLE.COM", "password": "password123"},
+        )
+        assert response.status_code == 200
+
+
+class TestLogout:
+    """Tests for the logout endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_logout_success(self, client: AsyncClient) -> None:
+        """Test logout with valid token returns success message."""
+        # Register and login
+        await client.post(
+            "/api/v1/auth/register",
+            json={"email": "logout@example.com", "password": "password123"},
+        )
+        login_response = await client.post(
+            "/api/v1/auth/login",
+            data={"username": "logout@example.com", "password": "password123"},
+        )
+        access_token = login_response.json()["access_token"]
+
+        # Logout
+        response = await client.post(
+            "/api/v1/auth/logout",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        assert response.status_code == 200
+        assert "Logout realizado com sucesso" in response.json()["message"]
+
+    @pytest.mark.asyncio
+    async def test_logout_without_token(self, client: AsyncClient) -> None:
+        """Test logout without token returns 401."""
+        response = await client.post("/api/v1/auth/logout")
+        assert response.status_code == 401
+
+
+class TestRefreshToken:
+    """Tests for the refresh token endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_refresh_token_success(self, client: AsyncClient) -> None:
+        """Test refresh token generates new access token."""
+        # Register and get tokens
+        response = await client.post(
+            "/api/v1/auth/register",
+            json={"email": "refresh@example.com", "password": "password123"},
+        )
+        refresh_token = response.json()["refresh_token"]
+
+        # Refresh
+        response = await client.post(
+            "/api/v1/auth/refresh",
+            json={"refresh_token": refresh_token},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "access_token" in data
+        assert "refresh_token" in data
+
+    @pytest.mark.asyncio
+    async def test_refresh_token_invalid(self, client: AsyncClient) -> None:
+        """Test invalid refresh token returns 401."""
+        response = await client.post(
+            "/api/v1/auth/refresh",
+            json={"refresh_token": "invalid.token.here"},
+        )
+        assert response.status_code == 401
+        assert "Sessão expirada" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_refresh_token_using_access_token(self, client: AsyncClient) -> None:
+        """Test using access token as refresh token fails."""
+        response = await client.post(
+            "/api/v1/auth/register",
+            json={"email": "wrongtype@example.com", "password": "password123"},
+        )
+        access_token = response.json()["access_token"]
+
+        response = await client.post(
+            "/api/v1/auth/refresh",
+            json={"refresh_token": access_token},
+        )
+        assert response.status_code == 401

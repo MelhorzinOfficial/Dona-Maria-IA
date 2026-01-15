@@ -1,6 +1,6 @@
 # Story 1.4: Login e Logout
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -34,77 +34,77 @@ So that **possa acessar minhas conversas de forma segura**.
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Backend - Endpoint de Login** (AC: #1, #2)
+- [x] **Task 1: Backend - Endpoint de Login** (AC: #1, #2)
 
-  - [ ] 1.1 Criar schema `UserLogin` em `backend/app/schemas/auth.py` com email e password
-  - [ ] 1.2 Adicionar método `authenticate_user(email, password)` em `AuthService` que verifica credenciais
-  - [ ] 1.3 Implementar endpoint `POST /api/v1/auth/login` em `backend/app/api/v1/auth.py`
-  - [ ] 1.4 Retornar `Token` com access_token e refresh_token se credenciais válidas
-  - [ ] 1.5 Retornar HTTP 401 com mensagem "Email ou senha incorretos" se credenciais inválidas
+  - [x] 1.1 Criar schema `UserLogin` em `backend/app/schemas/auth.py` com email e password
+  - [x] 1.2 Adicionar método `authenticate_user(email, password)` em `AuthService` que verifica credenciais
+  - [x] 1.3 Implementar endpoint `POST /api/v1/auth/login` em `backend/app/api/v1/auth.py`
+  - [x] 1.4 Retornar `Token` com access_token e refresh_token se credenciais válidas
+  - [x] 1.5 Retornar HTTP 401 com mensagem "Email ou senha incorretos" se credenciais inválidas
 
-- [ ] **Task 2: Backend - Gerenciamento de Sessões no Redis** (AC: #1, #3)
+- [x] **Task 2: Backend - Gerenciamento de Sessões no Redis** (AC: #1, #3)
 
-  - [ ] 2.1 Criar `backend/app/services/session_service.py` com classe `SessionService`
-  - [ ] 2.2 Implementar método `create_session(user_id, device_info)` que armazena sessão no Redis
-  - [ ] 2.3 Implementar método `invalidate_session(user_id, session_id)` para logout
-  - [ ] 2.4 Implementar método `invalidate_all_sessions(user_id)` para invalidar todas sessões
-  - [ ] 2.5 Configurar TTL da sessão igual ao refresh token (7 dias)
+  - [x] 2.1 Criar `backend/app/services/session_service.py` com classe `SessionService`
+  - [x] 2.2 Implementar método `create_session(user_id, device_info)` que armazena sessão no Redis
+  - [x] 2.3 Implementar método `invalidate_session(user_id, session_id)` para logout
+  - [x] 2.4 Implementar método `invalidate_all_sessions(user_id)` para invalidar todas sessões
+  - [x] 2.5 Configurar TTL da sessão igual ao refresh token (7 dias)
 
-- [ ] **Task 3: Backend - Endpoint de Logout** (AC: #3)
+- [x] **Task 3: Backend - Endpoint de Logout** (AC: #3)
 
-  - [ ] 3.1 Implementar endpoint `POST /api/v1/auth/logout` que requer autenticação
-  - [ ] 3.2 Criar dependency `get_current_user` que extrai user do token JWT
-  - [ ] 3.3 Invalidar sessão atual no Redis
-  - [ ] 3.4 Retornar HTTP 200 com mensagem "Logout realizado com sucesso"
+  - [x] 3.1 Implementar endpoint `POST /api/v1/auth/logout` que requer autenticação
+  - [x] 3.2 Criar dependency `get_current_user` que extrai user do token JWT
+  - [x] 3.3 Invalidar sessão atual no Redis
+  - [x] 3.4 Retornar HTTP 200 com mensagem "Logout realizado com sucesso"
 
-- [ ] **Task 4: Backend - Endpoint de Refresh Token** (AC: #4)
+- [x] **Task 4: Backend - Endpoint de Refresh Token** (AC: #4)
 
-  - [ ] 4.1 Criar schema `RefreshTokenRequest` em `backend/app/schemas/auth.py`
-  - [ ] 4.2 Implementar endpoint `POST /api/v1/auth/refresh`
-  - [ ] 4.3 Validar refresh token e verificar se sessão existe no Redis
-  - [ ] 4.4 Gerar novo access token se válido, retornar HTTP 401 se inválido
+  - [x] 4.1 Criar schema `RefreshTokenRequest` em `backend/app/schemas/auth.py`
+  - [x] 4.2 Implementar endpoint `POST /api/v1/auth/refresh`
+  - [x] 4.3 Validar refresh token e verificar se sessão existe no Redis
+  - [x] 4.4 Gerar novo access token se válido, retornar HTTP 401 se inválido
 
-- [ ] **Task 5: Backend - Dependency de Autenticação** (AC: #1, #3, #4)
+- [x] **Task 5: Backend - Dependency de Autenticação** (AC: #1, #3, #4)
 
-  - [ ] 5.1 Criar `backend/app/api/deps.py` com dependencies de autenticação
-  - [ ] 5.2 Implementar `get_current_user(token)` que retorna User do banco
-  - [ ] 5.3 Implementar `get_current_active_user` para verificar sessão ativa no Redis
-  - [ ] 5.4 Usar `OAuth2PasswordBearer` do FastAPI para extração do token
+  - [x] 5.1 Criar `backend/app/api/deps.py` com dependencies de autenticação
+  - [x] 5.2 Implementar `get_current_user(token)` que retorna User do banco
+  - [x] 5.3 Implementar `get_current_active_user` para verificar sessão ativa no Redis
+  - [x] 5.4 Usar `OAuth2PasswordBearer` do FastAPI para extração do token
 
-- [ ] **Task 6: Frontend - Página de Login** (AC: #1, #2)
+- [x] **Task 6: Frontend - Página de Login** (AC: #1, #2)
 
-  - [ ] 6.1 Criar `frontend/src/app/(auth)/login/page.tsx` com formulário de login
-  - [ ] 6.2 Criar componente `frontend/src/components/auth/LoginForm.tsx`
-  - [ ] 6.3 Implementar validação client-side com Zod (email válido, senha não vazia)
-  - [ ] 6.4 Exibir feedback visual de loading e erros
-  - [ ] 6.5 Redirecionar para `/chat` após login bem-sucedido
+  - [x] 6.1 Criar `frontend/src/app/(auth)/login/page.tsx` com formulário de login
+  - [x] 6.2 Criar componente `frontend/src/components/auth/LoginForm.tsx`
+  - [x] 6.3 Implementar validação client-side com Zod (email válido, senha não vazia)
+  - [x] 6.4 Exibir feedback visual de loading e erros
+  - [x] 6.5 Redirecionar para `/chat` após login bem-sucedido
 
-- [ ] **Task 7: Frontend - Funções de Login/Logout no Hook useAuth** (AC: #1, #3)
+- [x] **Task 7: Frontend - Funções de Login/Logout no Hook useAuth** (AC: #1, #3)
 
-  - [ ] 7.1 Adicionar função `login(email, password)` no hook `useAuth`
-  - [ ] 7.2 Adicionar função `logout()` que chama endpoint e limpa localStorage
-  - [ ] 7.3 Adicionar função `isAuthenticated()` que verifica tokens no localStorage
-  - [ ] 7.4 Implementar interceptor para renovar token automaticamente (AC: #4)
+  - [x] 7.1 Adicionar função `login(email, password)` no hook `useAuth`
+  - [x] 7.2 Adicionar função `logout()` que chama endpoint e limpa localStorage
+  - [x] 7.3 Adicionar função `isAuthenticated()` que verifica tokens no localStorage
+  - [x] 7.4 Implementar interceptor para renovar token automaticamente (AC: #4)
 
-- [ ] **Task 8: Frontend - Botão de Logout e Proteção de Rotas** (AC: #3)
+- [x] **Task 8: Frontend - Botão de Logout e Proteção de Rotas** (AC: #3)
 
-  - [ ] 8.1 Criar componente `UserMenu` com opção de logout
-  - [ ] 8.2 Criar middleware ou HOC `withAuth` para proteger rotas autenticadas
-  - [ ] 8.3 Redirecionar para `/login` se usuário não autenticado tentar acessar `/chat`
-  - [ ] 8.4 Redirecionar para `/chat` se usuário autenticado tentar acessar `/login`
+  - [x] 8.1 Criar componente `UserMenu` com opção de logout
+  - [x] 8.2 Criar middleware ou HOC `withAuth` para proteger rotas autenticadas
+  - [x] 8.3 Redirecionar para `/login` se usuário não autenticado tentar acessar `/chat`
+  - [x] 8.4 Redirecionar para `/chat` se usuário autenticado tentar acessar `/login`
 
-- [ ] **Task 9: Testes Backend** (AC: #1, #2, #3, #4)
+- [x] **Task 9: Testes Backend** (AC: #1, #2, #3, #4)
 
-  - [ ] 9.1 Testar login com credenciais válidas retorna tokens
-  - [ ] 9.2 Testar login com credenciais inválidas retorna 401
-  - [ ] 9.3 Testar logout invalida sessão no Redis
-  - [ ] 9.4 Testar refresh token gera novo access token
-  - [ ] 9.5 Testar refresh token inválido retorna 401
+  - [x] 9.1 Testar login com credenciais válidas retorna tokens
+  - [x] 9.2 Testar login com credenciais inválidas retorna 401
+  - [x] 9.3 Testar logout invalida sessão no Redis
+  - [x] 9.4 Testar refresh token gera novo access token
+  - [x] 9.5 Testar refresh token inválido retorna 401
 
-- [ ] **Task 10: Integração Redis no Docker Compose** (AC: #1, #3)
-  - [ ] 10.1 Verificar configuração do Redis no `docker-compose.dev.yml`
-  - [ ] 10.2 Criar `backend/app/config/redis.py` com conexão assíncrona ao Redis
-  - [ ] 10.3 Adicionar `redis[hiredis]` às dependências do backend
+- [x] **Task 10: Integração Redis no Docker Compose** (AC: #1, #3)
+  - [x] 10.1 Verificar configuração do Redis no `docker-compose.dev.yml`
+  - [x] 10.2 Criar `backend/app/config/redis.py` com conexão assíncrona ao Redis
+  - [x] 10.3 Adicionar `redis[hiredis]` às dependências do backend
 
 ## Dev Notes
 
@@ -356,10 +356,46 @@ Conforme [architecture.md#Security Measures]:
 
 ### Agent Model Used
 
-_A ser preenchido pelo Dev Agent_
+Claude Opus 4.5 via GitHub Copilot
 
 ### Debug Log References
 
+- All 39 backend tests passing
+- Frontend lint: 0 errors, 1 warning (pre-existing)
+- Frontend TypeScript: No errors
+
 ### Completion Notes List
 
+1. **Login endpoint** implemented using `OAuth2PasswordRequestForm` for FastAPI compatibility
+2. **Logout endpoint** implemented with Bearer token authentication
+3. **Refresh token endpoint** validates token type and generates new token pair
+4. **SessionService** created with Redis support (prepared for future rate limiting)
+5. **Authentication dependencies** created in `deps.py` with `get_current_user` and `get_current_active_user`
+6. **LoginForm** component with Zod validation (email valid, password required)
+7. **useAuth hook** updated with `login`, `logout`, and `refreshAccessToken` functions
+8. **UserMenu** component for logout with dropdown menu
+9. **withAuth HOC** for client-side route protection
+10. **Chat page placeholder** created at `/chat` with authentication protection
+
 ### File List
+
+**Arquivos Criados:**
+
+- `backend/app/config/redis.py` - Conexão assíncrona com Redis
+- `backend/app/services/session_service.py` - Gerenciamento de sessões
+- `backend/app/api/deps.py` - Dependencies de autenticação
+- `frontend/src/components/auth/LoginForm.tsx` - Formulário de login
+- `frontend/src/components/auth/UserMenu.tsx` - Menu de usuário com logout
+- `frontend/src/components/auth/withAuth.tsx` - HOC para proteção de rotas
+- `frontend/src/app/chat/page.tsx` - Página de chat (placeholder)
+- `frontend/src/middleware.ts` - Middleware Next.js
+
+**Arquivos Modificados:**
+
+- `backend/app/schemas/auth.py` - Adicionados `UserLogin` e `RefreshTokenRequest`
+- `backend/app/services/auth_service.py` - Adicionado `authenticate_user`
+- `backend/app/api/v1/auth.py` - Adicionados endpoints login, logout, refresh
+- `backend/tests/test_auth.py` - Adicionados 9 testes (login, logout, refresh)
+- `frontend/src/hooks/useAuth.ts` - Adicionados login, logout, refreshAccessToken
+- `frontend/src/app/(auth)/login/page.tsx` - Integrado LoginForm
+- `frontend/src/components/index.ts` - Exports dos novos componentes

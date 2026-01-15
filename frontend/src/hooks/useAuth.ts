@@ -33,6 +33,62 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
 
   /**
+   * Fazer login com email e senha.
+   *
+   * @param email - Email do usuário.
+   * @param password - Senha do usuário.
+   * @returns Promise com tokens em caso de sucesso.
+   */
+  const login = useCallback(
+    async (email: string, password: string): Promise<AuthTokens | null> => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // OAuth2PasswordRequestForm espera form data, não JSON
+        const formData = new URLSearchParams();
+        formData.append('username', email);
+        formData.append('password', password);
+
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          try {
+            const errorData: ApiError = await response.json();
+            setError(errorData.detail || 'Email ou senha incorretos');
+          } catch {
+            setError('Erro ao fazer login. Tente novamente.');
+          }
+          return null;
+        }
+
+        const tokens: AuthTokens = await response.json();
+
+        // Armazenar tokens
+        localStorage.setItem('access_token', tokens.access_token);
+        localStorage.setItem('refresh_token', tokens.refresh_token);
+
+        // Redirecionar para o chat
+        router.push('/chat');
+
+        return tokens;
+      } catch {
+        setError('Erro de conexão. Tente novamente.');
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [router]
+  );
+
+  /**
    * Registrar novo usuário.
    *
    * @param data - Email e senha do novo usuário.
@@ -127,13 +183,64 @@ export function useAuth() {
   /**
    * Fazer logout do usuário.
    *
-   * Remove tokens e redireciona para login.
+   * Chama endpoint de logout, remove tokens e redireciona para landing page.
    */
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    const accessToken = getAccessToken();
+
+    // Chamar endpoint de logout se tiver token
+    if (accessToken) {
+      try {
+        await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+      } catch {
+        // Ignorar erros - vamos limpar tokens de qualquer forma
+      }
+    }
+
+    // Limpar tokens locais
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    router.push('/login');
-  }, [router]);
+    router.push('/');
+  }, [router, getAccessToken]);
+
+  /**
+   * Renovar access token usando refresh token.
+   *
+   * @returns Novos tokens ou null se falhar.
+   */
+  const refreshAccessToken = useCallback(async (): Promise<AuthTokens | null> => {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) return null;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+
+      if (!response.ok) {
+        // Refresh token inválido - fazer logout
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        return null;
+      }
+
+      const tokens: AuthTokens = await response.json();
+      localStorage.setItem('access_token', tokens.access_token);
+      localStorage.setItem('refresh_token', tokens.refresh_token);
+      return tokens;
+    } catch {
+      return null;
+    }
+  }, []);
 
   /**
    * Limpar erro atual.
@@ -143,12 +250,14 @@ export function useAuth() {
   }, []);
 
   return {
+    login,
     register,
     loginWithOAuth,
     setTokens,
     getAccessToken,
     isAuthenticated,
     logout,
+    refreshAccessToken,
     isLoading,
     error,
     clearError,

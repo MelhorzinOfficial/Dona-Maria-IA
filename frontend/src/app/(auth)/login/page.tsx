@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { LoginForm } from '@/components/auth/LoginForm';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 
 /**
@@ -29,8 +30,8 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Botões OAuth */}
-          <OAuthButtons />
+          {/* Formulário de login com email */}
+          <LoginForm />
 
           {/* Separador */}
           <div className="my-6 flex items-center">
@@ -39,10 +40,8 @@ export default function LoginPage() {
             <div className="flex-1 border-t border-[#e4f1ff]/20"></div>
           </div>
 
-          {/* Formulário de login com email (placeholder para story 1.4) */}
-          <div className="text-center text-sm text-[#e4f1ff]/50">
-            Login com email será implementado em breve.
-          </div>
+          {/* Botões OAuth */}
+          <OAuthButtons />
 
           {/* Link para Registro */}
           <p className="mt-6 text-center text-sm text-[#e4f1ff]/70">

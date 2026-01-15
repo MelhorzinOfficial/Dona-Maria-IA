@@ -53,6 +53,19 @@ class TokenData(BaseModel):
     user_id: UUID | None = None
 
 
+class UserLogin(BaseModel):
+    """Schema para login de usuário."""
+
+    email: EmailStr = Field(..., description="Email do usuário")
+    password: str = Field(..., min_length=1, description="Senha do usuário")
+
+
+class RefreshTokenRequest(BaseModel):
+    """Schema para renovação de token."""
+
+    refresh_token: str = Field(..., description="Refresh token válido")
+
+
 class OAuthUserInfo(BaseModel):
     """Informações do usuário retornadas pelo provedor OAuth."""
 
