@@ -5,9 +5,17 @@ Schemas Pydantic para autenticação e validação de dados de usuário.
 """
 
 from datetime import datetime
+from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
+
+
+class OAuthProvider(str, Enum):
+    """Provedores OAuth suportados."""
+
+    GOOGLE = "google"
+    GITHUB = "github"
 
 
 class UserCreate(BaseModel):
@@ -43,3 +51,22 @@ class TokenData(BaseModel):
     """Schema com dados extraídos do token JWT."""
 
     user_id: UUID | None = None
+
+
+class OAuthUserInfo(BaseModel):
+    """Informações do usuário retornadas pelo provedor OAuth."""
+
+    provider: OAuthProvider
+    provider_user_id: str
+    email: str
+    name: str | None = None
+    avatar_url: str | None = None
+
+
+class OAuthCallbackResponse(BaseModel):
+    """Resposta do callback OAuth."""
+
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    user: UserResponse

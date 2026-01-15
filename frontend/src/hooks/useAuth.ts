@@ -18,12 +18,14 @@ interface ApiError {
   detail: string;
 }
 
+type OAuthProvider = 'google' | 'github';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 /**
  * Hook para autenticação de usuários.
  *
- * Fornece funções para registro, login e gerenciamento de estado de autenticação.
+ * Fornece funções para registro, login, OAuth e gerenciamento de estado de autenticação.
  */
 export function useAuth() {
   const router = useRouter();
@@ -81,6 +83,59 @@ export function useAuth() {
   );
 
   /**
+   * Iniciar login via OAuth.
+   *
+   * Redireciona para o provedor OAuth.
+   *
+   * @param provider - Provedor OAuth ('google' ou 'github').
+   */
+  const loginWithOAuth = useCallback((provider: OAuthProvider) => {
+    // Redirecionar para endpoint OAuth do backend
+    window.location.href = `${API_BASE_URL}/api/v1/auth/oauth/${provider}`;
+  }, []);
+
+  /**
+   * Armazenar tokens de autenticação.
+   *
+   * @param accessToken - Token de acesso JWT.
+   * @param refreshToken - Token de refresh JWT.
+   */
+  const setTokens = useCallback((accessToken: string, refreshToken: string) => {
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+  }, []);
+
+  /**
+   * Obter token de acesso armazenado.
+   *
+   * @returns Token de acesso ou null se não existir.
+   */
+  const getAccessToken = useCallback((): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('access_token');
+  }, []);
+
+  /**
+   * Verificar se usuário está autenticado.
+   *
+   * @returns True se há token de acesso armazenado.
+   */
+  const isAuthenticated = useCallback((): boolean => {
+    return getAccessToken() !== null;
+  }, [getAccessToken]);
+
+  /**
+   * Fazer logout do usuário.
+   *
+   * Remove tokens e redireciona para login.
+   */
+  const logout = useCallback(() => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    router.push('/login');
+  }, [router]);
+
+  /**
    * Limpar erro atual.
    */
   const clearError = useCallback(() => {
@@ -89,6 +144,11 @@ export function useAuth() {
 
   return {
     register,
+    loginWithOAuth,
+    setTokens,
+    getAccessToken,
+    isAuthenticated,
+    logout,
     isLoading,
     error,
     clearError,

@@ -46,8 +46,8 @@ development_status:
  epic-1: in-progress
  1-1-setup-inicial-do-projeto: done
  1-2-registro-de-usuario-com-email: done
- 1-3-registro-com-oauth-google-e-github: backlog
- 1-4-login-e-logout: backlog
+ 1-3-registro-com-oauth-google-e-github: review
+ 1-4-login-e-logout: ready-for-dev
  1-5-reset-de-senha-via-email: backlog
  epic-1-retrospective: optional
 

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { RegisterForm } from '@/components/auth/RegisterForm';
+import { OAuthButtons } from '@/components/auth/OAuthButtons';
 
 /**
  * Página de registro de novo usuário.
@@ -16,6 +17,17 @@ export default function RegisterPage() {
 
         {/* Card do Formulário */}
         <div className="rounded-lg border border-[#e4f1ff]/10 bg-[#333333]/80 p-8 shadow-lg backdrop-blur-sm">
+          {/* Botões OAuth */}
+          <OAuthButtons />
+
+          {/* Separador */}
+          <div className="my-6 flex items-center">
+            <div className="flex-1 border-t border-[#e4f1ff]/20"></div>
+            <span className="px-4 text-sm text-[#e4f1ff]/50">ou</span>
+            <div className="flex-1 border-t border-[#e4f1ff]/20"></div>
+          </div>
+
+          {/* Formulário tradicional */}
           <RegisterForm />
 
           {/* Link para Login */}
