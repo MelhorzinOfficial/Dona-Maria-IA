@@ -29,12 +29,6 @@ services:
     condition: service_healthy
   networks:
    - dokploy-network
-  labels:
-   - 'traefik.enable=true'
-   - 'traefik.http.routers.dona-maria-frontend.rule=Host(`${FRONTEND_DOMAIN}`)'
-   - 'traefik.http.routers.dona-maria-frontend.entrypoints=websecure'
-   - 'traefik.http.routers.dona-maria-frontend.tls.certResolver=letsencrypt'
-   - 'traefik.http.services.dona-maria-frontend.loadbalancer.server.port=3000'
 
  # ==========================================
  # Backend - FastAPI
@@ -52,9 +46,15 @@ services:
    - ENVIRONMENT=production
    - DEBUG=false
    - SECRET_KEY=${SECRET_KEY}
-   - CORS_ORIGINS=["https://${FRONTEND_DOMAIN}"]
+   - CORS_ORIGINS=${CORS_ORIGINS:-["https://donamaria.melhorzin.com"]}
    - OPENAI_API_KEY=${OPENAI_API_KEY:-}
    - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+  healthcheck:
+   test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
+   interval: 30s
+   timeout: 10s
+   retries: 3
+   start_period: 40s
   depends_on:
    postgres:
     condition: service_healthy
@@ -62,12 +62,6 @@ services:
     condition: service_healthy
   networks:
    - dokploy-network
-  labels:
-   - 'traefik.enable=true'
-   - 'traefik.http.routers.dona-maria-backend.rule=Host(`${BACKEND_DOMAIN}`)'
-   - 'traefik.http.routers.dona-maria-backend.entrypoints=websecure'
-   - 'traefik.http.routers.dona-maria-backend.tls.certResolver=letsencrypt'
-   - 'traefik.http.services.dona-maria-backend.loadbalancer.server.port=8000'
 
  # ==========================================
  # PostgreSQL Database
