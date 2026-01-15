@@ -18,6 +18,7 @@ EXPOSE 3000
 # Environment
 ENV NODE_ENV=development
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOSTNAME=0.0.0.0
 
-# Start development server with hot reload
-CMD ["npm", "run", "dev"]
+# Start development server with hot reload (listening on all interfaces)
+CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
