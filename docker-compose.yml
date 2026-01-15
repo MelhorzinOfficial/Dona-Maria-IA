@@ -1,5 +1,6 @@
 # Dona Maria IA - Docker Compose Development
 # Run with: docker-compose up -d
+# Configure ports in .env file if defaults conflict
 
 services:
  frontend:
@@ -7,14 +8,14 @@ services:
    context: ./frontend
    dockerfile: Dockerfile.dev
   ports:
-   - '3000:3000'
+   - '${FRONTEND_PORT:-3000}:3000'
   volumes:
    - ./frontend:/app
    - /app/node_modules
    - /app/.next
   environment:
-   - NEXT_PUBLIC_API_URL=http://localhost:8000
-   - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+   - NEXT_PUBLIC_API_URL=http://localhost:${BACKEND_PORT:-8000}
+   - NEXT_PUBLIC_WS_URL=ws://localhost:${BACKEND_PORT:-8000}
    - WATCHPACK_POLLING=true
   depends_on:
    - backend
@@ -26,15 +27,15 @@ services:
    context: ./backend
    dockerfile: Dockerfile.dev
   ports:
-   - '8000:8000'
+   - '${BACKEND_PORT:-8000}:8000'
   volumes:
    - ./backend:/app
   environment:
-   - DATABASE_URL=postgresql://dona:maria@postgres:5432/donamaria
+   - DATABASE_URL=postgresql://${POSTGRES_USER:-dona}:${POSTGRES_PASSWORD:-maria}@postgres:5432/${POSTGRES_DB:-donamaria}
    - REDIS_URL=redis://redis:6379
    - DEBUG=true
    - ENVIRONMENT=development
-   - CORS_ORIGINS=["http://localhost:3000"]
+   - CORS_ORIGINS=["http://localhost:${FRONTEND_PORT:-3000}"]
   depends_on:
    postgres:
     condition: service_healthy
@@ -46,7 +47,7 @@ services:
  postgres:
   image: postgres:16-alpine
   ports:
-   - '5432:5432'
+   - '${POSTGRES_PORT:-5432}:5432'
   environment:
    - POSTGRES_USER=dona
    - POSTGRES_PASSWORD=maria
@@ -64,7 +65,7 @@ services:
  redis:
   image: redis:7-alpine
   ports:
-   - '6379:6379'
+   - '${REDIS_PORT:-6379}:6379'
   volumes:
    - redis_data:/data
   healthcheck:
