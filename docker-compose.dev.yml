@@ -1,0 +1,94 @@
+# ============================================
+# Dona Maria IA - Development Docker Compose
+# ============================================
+# Usage:
+#   docker-compose -f docker-compose.dev.yml up -d
+#
+# Features:
+#   - Hot reload for frontend and backend
+#   - Volume mounts for code syncing
+#   - Debug mode enabled
+# ============================================
+
+services:
+ frontend:
+  build:
+   context: ./frontend
+   dockerfile: Dockerfile.dev
+  ports:
+   - '${FRONTEND_PORT:-3000}:3000'
+  volumes:
+   - ./frontend:/app
+   - /app/node_modules
+   - /app/.next
+  environment:
+   - NEXT_PUBLIC_API_URL=http://localhost:${BACKEND_PORT:-8000}
+   - NEXT_PUBLIC_WS_URL=ws://localhost:${BACKEND_PORT:-8000}
+   - WATCHPACK_POLLING=true
+  depends_on:
+   - backend
+  networks:
+   - dona-maria-network
+
+ backend:
+  build:
+   context: ./backend
+   dockerfile: Dockerfile.dev
+  ports:
+   - '${BACKEND_PORT:-8000}:8000'
+  volumes:
+   - ./backend:/app
+  environment:
+   - DATABASE_URL=postgresql://${POSTGRES_USER:-dona}:${POSTGRES_PASSWORD:-maria}@postgres:5432/${POSTGRES_DB:-donamaria}
+   - REDIS_URL=redis://redis:6379
+   - DEBUG=true
+   - ENVIRONMENT=development
+   - CORS_ORIGINS=["http://localhost:${FRONTEND_PORT:-3000}"]
+  depends_on:
+   postgres:
+    condition: service_healthy
+   redis:
+    condition: service_healthy
+  networks:
+   - dona-maria-network
+
+ postgres:
+  image: postgres:16-alpine
+  ports:
+   - '${POSTGRES_PORT:-5432}:5432'
+  environment:
+   - POSTGRES_USER=${POSTGRES_USER:-dona}
+   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-maria}
+   - POSTGRES_DB=${POSTGRES_DB:-donamaria}
+  volumes:
+   - postgres_data:/var/lib/postgresql/data
+  healthcheck:
+   test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-dona} -d ${POSTGRES_DB:-donamaria}']
+   interval: 5s
+   timeout: 5s
+   retries: 5
+  networks:
+   - dona-maria-network
+
+ redis:
+  image: redis:7-alpine
+  ports:
+   - '${REDIS_PORT:-6379}:6379'
+  volumes:
+   - redis_data:/data
+  healthcheck:
+   test: ['CMD', 'redis-cli', 'ping']
+   interval: 5s
+   timeout: 5s
+   retries: 5
+  command: redis-server --appendonly yes
+  networks:
+   - dona-maria-network
+
+volumes:
+ postgres_data:
+ redis_data:
+
+networks:
+ dona-maria-network:
+  driver: bridge
